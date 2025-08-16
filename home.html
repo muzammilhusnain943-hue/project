@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Website</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+
+
+  <header>
+    <nav class="nav">
+      <div class="logo">
+        <div class="logo-badge">TR</div>
+        <span>Travel Recommender</span>
+      </div>
+      <div class="menu" role="navigation">
+        <a href="#home" class="active">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="home">
+    <div class="hero">
+      <div>
+        <h1>Find your next <span style="color:var(--brand)">memorable</span> trip.</h1>
+        <p>
+          Smart, personalized suggestions based on what you love—beaches, temples, or a city like
+          <em>Toronto</em>. Dive into rich descriptions, photos, and quick facts to plan with confidence.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>How it works</strong>
+        <ol style="margin:8px 0 0 16px; color: var(--muted)">
+          <li>Type a preference (e.g., <em>beaches</em>, <em>temples</em>) or a city (e.g., <em>Toronto, Canada</em>).</li>
+          <li>We curate top picks instantly with images and details.</li>
+          <li>See the local time for city searches at a glance.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="search-panel">
+      <div class="search-box">
+        <input id="query" placeholder="Try: beaches · temples · Toronto, Canada" aria-label="Search destinations" />
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="chips">
+        <button class="chip" data-q="beaches">Beaches</button>
+        <button class="chip" data-q="temples">Temples</button>
+        <button class="chip" data-q="Toronto, Canada">Toronto, Canada</button>
+        <button class="chip" data-q="Kyoto, Japan">Kyoto, Japan</button>
+        <button class="chip" data-q="Karachi, Pakistan">Karachi, Pakistan</button>
+      </div>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div class="results" id="results" aria-live="polite"></div>
+  </main>
+
+<footer>
+    <p>&copy; 2025 My Travel Website | All Rights Reserved</p>
+    <p>
+      <a href="index.html">Home</a> | 
+      <a href="about.html">About Us</a> | 
+      <a href="contact.html">Contact Us</a>
+    </p>
+  </footer>
+
+
+<script src="travel.js"></script>
+</body>
+</html>

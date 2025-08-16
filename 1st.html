@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Recommender</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0f172a; /* slate-900 */
+      --panel: #111827; /* gray-900 */
+      --muted: #9ca3af; /* gray-400 */
+      --text: #e5e7eb; /* gray-200 */
+      --brand: #22d3ee; /* cyan-400 */
+      --accent: #f59e0b; /* amber-500 */
+      --card: #0b1220;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1020 0%, #0f172a 100%);
+      color: var(--text);
+    }
+    a{color: inherit; text-decoration: none}
+    img{max-width:100%; display:block}
+
+    /* Header + Nav */
+    header{
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(2,6,23,0.6);
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+    }
+    .nav{
+      max-width: 1100px; margin: 0 auto; padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:0.5px}
+    .logo-badge{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-weight:800; background: linear-gradient(135deg, var(--brand), #60a5fa)}
+    .menu{display:flex; gap:18px}
+    .menu a{opacity:0.9; padding:8px 10px; border-radius:10px}
+    .menu a.active, .menu a:hover{background:#0b1220; opacity:1}
+
+    /* Hero */
+    .hero{
+      max-width:1100px; margin: 28px auto 0; padding: 24px 16px 8px;
+      display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items:center;
+    }
+    .hero h1{font-size: clamp(28px, 4vw, 44px); line-height:1.1; margin: 0 0 10px}
+    .hero p{color: var(--muted); margin:0}
+    .hero-card{background: linear-gradient(180deg, #0c1222, #0a0f1c); border:1px solid rgba(148,163,184,0.15); padding: 18px; border-radius:20px}
+
+    /* Search */
+    .search-panel{max-width:1100px; margin: 14px auto; padding: 0 16px 16px}
+    .search-box{
+      background: var(--panel);
+      border: 1px solid rgba(148,163,184,0.15);
+      border-radius: 16px;
+      padding: 14px; display:flex; gap:10px; align-items:center;
+    }
+    .search-box input{
+      flex:1; background:transparent; border:none; outline:none; color: var(--text);
+      font-size:16px;
+    }
+    .search-box button{
+      background: linear-gradient(135deg, var(--brand), #60a5fa);
+      border:none; color:#05131a; font-weight:800; padding:10px 14px; border-radius:12px; cursor:pointer
+    }
+    .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .chip{font-size:12px; color:#031018; background:linear-gradient(135deg,#fef3c7,#f59e0b); border:none; padding:6px 10px; border-radius:999px; cursor:pointer}
+
+    .meta{display:flex; gap:14px; align-items:center; margin-top:10px; color: var(--muted); font-size: 14px}
+    .time-badge{background:#0b1220; border:1px solid rgba(148,163,184,0.15); padding:6px 10px; border-radius:10px; color:#cbd5e1}
+
+    /* Results grid */
+    .results{max-width:1100px; margin: 8px auto 26px; padding: 0 16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px}
+    .card{
+      background: var(--card);
+      border:1px solid rgba(148,163,184,0.15);
+      border-radius: 18px; overflow:hidden; display:flex; flex-direction:column
+    }
+    .card img{height:160px; width:100%; object-fit:cover}
+    .card .p{padding:14px}
+    .card h3{margin:0 0 6px; font-size:18px}
+    .tag{display:inline-block; font-size:11px; color:#022c22; background:linear-gradient(135deg,#a7f3d0,#34d399); padding:4px 8px; border-radius:999px; margin-right:6px}
+    .more{margin-top:auto; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-top:1px solid rgba(148,163,184,0.12)}
+    .more a{font-weight:600; color:#93c5fd}
+
+    /* Sections */
+    section{scroll-margin-top:80px}
+    #about, #contact{max-width:1100px; margin: 40px auto; padding:0 16px}
+
+    .about-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px}
+    .tile{background: var(--panel); border:1px solid rgba(148,163,184,0.15); border-radius:18px; padding:16px}
+    .timeline{position:relative}
+    .timeline::before{content:""; position:absolute; left:12px; top:8px; bottom:8px; width:2px; background: rgba(148,163,184,0.25)}
+    .milestone{position:relative; padding-left:28px; margin:12px 0}
+    .milestone::before{content:""; position:absolute; left:8px; top:6px; width:10px; height:10px; border-radius:50%; background: linear-gradient(135deg, var(--brand), #60a5fa)}
+
+    /* Contact */
+    form{display:grid; gap:10px; max-width:680px}
+    label{font-weight:600}
+    input, textarea{
+      width:100%; background:#0b1220; color: var(--text);
+      border:1px solid rgba(148,163,184,0.2); border-radius:12px; padding:10px
+    }
+    textarea{min-height:120px}
+    .btn{background: linear-gradient(135deg, #34d399, #22d3ee); border:none; color:#052221; font-weight:800; padding:12px 16px; border-radius:12px; cursor:pointer}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(148,163,184,0.15); color:var(--muted); padding:24px 16px; text-align:center}
+
+    @media (max-width: 880px){
+      .hero{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="logo">
+        <div class="logo-badge">TR</div>
+        <span>Travel Recommender</span>
+      </div>
+      <div class="menu" role="navigation">
+        <a href="#home" class="active">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact Us</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HOME / SEARCH -->
+  <main id="home">
+    <div class="hero">
+      <div>
+        <h1>Find your next <span style="color:var(--brand)">memorable</span> trip.</h1>
+        <p>
+          Smart, personalized suggestions based on what you love—beaches, temples, or a city like
+          <em>Toronto</em>. Dive into rich descriptions, photos, and quick facts to plan with confidence.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>How it works</strong>
+        <ol style="margin:8px 0 0 16px; color: var(--muted)">
+          <li>Type a preference (e.g., <em>beaches</em>, <em>temples</em>) or a city (e.g., <em>Toronto, Canada</em>).</li>
+          <li>We curate top picks instantly with images and details.</li>
+          <li>See the local time for city searches at a glance.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="search-panel">
+      <div class="search-box">
+        <input id="query" placeholder="Try: beaches · temples · Toronto, Canada" aria-label="Search destinations" />
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="chips">
+        <button class="chip" data-q="beaches">Beaches</button>
+        <button class="chip" data-q="temples">Temples</button>
+        <button class="chip" data-q="Toronto, Canada">Toronto, Canada</button>
+        <button class="chip" data-q="Kyoto, Japan">Kyoto, Japan</button>
+        <button class="chip" data-q="Karachi, Pakistan">Karachi, Pakistan</button>
+      </div>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div class="results" id="results" aria-live="polite"></div>
+  </main>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h2>About Us</h2>
+    <div class="about-grid" style="margin-top:12px">
+      <div class="tile">
+        <h3>Mission & Values</h3>
+        <p>
+          We help travelers discover places that match their passions. Our values: user-first design, privacy,
+          transparency, and responsible tourism.
+        </p>
+        <ul>
+          <li>Purpose: Empower informed, joyful travel.</li>
+          <li>Commitment: Clear info, honest curation.</li>
+          <li>Goal: Reduce planning friction.</li>
+        </ul>
+      </div>
+
+      <div class="tile">
+        <h3>Team</h3>
+        <ul style="margin:0; padding-left:18px">
+          <li><strong>Amara Khan</strong> — Product Lead</li>
+          <li><strong>David Chen</strong> — Data & Recommendations</li>
+          <li><strong>Sara Rahman</strong> — UX & Accessibility</li>
+          <li><strong>Luis García</strong> — Frontend Engineer</li>
+        </ul>
+      </div>
+
+      <div class="tile timeline">
+        <h3 style="margin-top:0">Our History</h3>
+        <div class="milestone"><strong>2019</strong> — Idea sparked on a backpacking trip.</div>
+        <div class="milestone"><strong>2021</strong> — First public beta with 200+ destinations.</div>
+        <div class="milestone"><strong>2023</strong> — Added city time insight & accessibility upgrade.</div>
+        <div class="milestone"><strong>2025</strong> — Launch personalized guides & trip boards.</div>
+      </div>
+
+      <div class="tile">
+        <h3>Offices & Map</h3>
+        <p>We’re a remote‑first team with collaboration hubs in:</p>
+        <ul style="margin:0; padding-left:18px">
+          <li>Toronto, Canada</li>
+          <li>Lisbon, Portugal</li>
+          <li>Karachi, Pakistan</li>
+        </ul>
+        <div style="border-radius:12px; overflow:hidden; margin-top:10px">
+          <iframe title="Map" width="100%" height="200" style="border:0" loading="lazy" allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2886807.3944847505!2d-83.44174884131635!3d43.14362962307409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc91a9a99d8d36d%3A0x106d69f7c4f6ef77!2sToronto%2C%20ON%2C%20Canada!5e0!3m2!1sen!2s!4v1686512345678"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p style="color:var(--muted)">Questions or feedback? We’d love to hear from you.</p>
+    <form id="contactForm" novalidate>
+      <div>
+        <label for="name">Name</label>
+        <input id="name" name="name" placeholder="Your full name" required />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" required />
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="How can we help?" required></textarea>
+      </div>
+      <button class="btn" type="submit">Send Message</button>
+      <p id="formStatus" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <footer>
+     <span id="year"></span> Travel Recommender — Built with vanilla JS
+  </footer>
+
+  <script>
+  // ------------------------------
+  // Simple in-app dataset
+  // ------------------------------
+  const DESTINATIONS = [
+    {
+      id: 'maldives',
+      name: 'Maldives',
+      type: 'beach',
+      city: 'Male',
+      country: 'Maldives',
+      description: 'Crystal-clear waters, overwater villas, and world-class snorkeling.',
+      image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Maldives'
+    },
+    {
+      id: 'bali',
+      name: 'Bali Beaches',
+      type: 'beach',
+      city: 'Kuta',
+      country: 'Indonesia',
+      description: 'Surf‑ready waves, sunsets, and vibrant culture along scenic shores.',
+      image: 'https://images.unsplash.com/photo-1518544801976-3e188ea1f36b?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Bali'
+    },
+    {
+      id: 'copacabana',
+      name: 'Copacabana',
+      type: 'beach',
+      city: 'Rio de Janeiro',
+      country: 'Brazil',
+      description: 'Iconic crescent beach with lively boardwalk and city views.',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Copacabana,_Rio_de_Janeiro'
+    },
+    {
+      id: 'boracay',
+      name: 'Boracay White Beach',
+      type: 'beach',
+      city: 'Malay',
+      country: 'Philippines',
+      description: 'Powdery white sand and calm blue waters—perfect for relaxation.',
+      image: 'https://images.unsplash.com/photo-1548595224-2c00b3a1a680?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Boracay'
+    },
+    {
+      id: 'meenakshi',
+      name: 'Meenakshi Temple',
+      type: 'temple',
+      city: 'Madurai',
+      country: 'India',
+      description: 'A Dravidian architectural marvel with soaring gopurams and vibrant sculptures.',
+      image: 'https://images.unsplash.com/photo-1583417319070-4b08deebe8da?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Meenakshi_Temple'
+    },
+    {
+      id: 'angkorwat',
+      name: 'Angkor Wat',
+      type: 'temple',
+      city: 'Siem Reap',
+      country: 'Cambodia',
+      description: 'Vast temple complex famed for intricate bas‑reliefs and sunrise views.',
+      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Angkor_Wat'
+    },
+    {
+      id: 'sensoji',
+      name: 'Senso-ji Temple',
+      type: 'temple',
+      city: 'Tokyo',
+      country: 'Japan',
+      description: 'Historic Buddhist temple with a lively Nakamise shopping street.',
+      image: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d6?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Sens%C5%8D-ji'
+    },
+    {
+      id: 'toronto',
+      name: 'Toronto Highlights',
+      type: 'city',
+      city: 'Toronto',
+      country: 'Canada',
+      description: 'CN Tower, Royal Ontario Museum, Distillery District, and waterfront strolls.',
+      image: 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Toronto'
+    },
+    {
+      id: 'kyoto',
+      name: 'Kyoto Landmarks',
+      type: 'city',
+      city: 'Kyoto',
+      country: 'Japan',
+      description: 'Fushimi Inari, Kiyomizu‑dera, Arashiyama Bamboo Grove, and Gion.',
+      image: 'https://images.unsplash.com/photo-1434025697302-54853b8da166?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Kyoto'
+    },
+    {
+      id: 'karachi',
+      name: 'Karachi Attractions',
+      type: 'city',
+      city: 'Karachi',
+      country: 'Pakistan',
+      description: 'Clifton Beach, Quaid‑e‑Azam Mausoleum, Pakistan Maritime Museum, Burns Road food.',
+      image: 'https://images.unsplash.com/photo-1605037850936-f0e443f1d00d?q=80&w=1600&auto=format&fit=crop',
+      link: 'https://en.wikipedia.org/wiki/Karachi'
+    }
+  ];
+
+  // City to IANA time zones (sample). Extend as needed.
+  const CITY_TIMEZONES = {
+    'Toronto, Canada': 'America/Toronto',
+    'Toronto': 'America/Toronto',
+    'Kyoto, Japan': 'Asia/Tokyo',
+    'Kyoto': 'Asia/Tokyo',
+    'Tokyo, Japan': 'Asia/Tokyo',
+    'Tokyo': 'Asia/Tokyo',
+    'Karachi, Pakistan': 'Asia/Karachi',
+    'Karachi': 'Asia/Karachi',
+    'Male, Maldives': 'Indian/Maldives',
+    'Madurai, India': 'Asia/Kolkata',
+    'Siem Reap, Cambodia': 'Asia/Phnom_Penh',
+    'Rio de Janeiro, Brazil': 'America/Sao_Paulo'
+  };
+
+  // ------------------------------
+  // Helpers
+  // ------------------------------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  function createCard(item){
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div class="p">
+        <span class="tag">${item.type}</span>
+        <h3>${item.name}</h3>
+        <p style="color:var(--muted)">${item.description}</p>
+        <p style="margin:6px 0 0; font-size: 13px; color:#cbd5e1">${item.city}, ${item.country}</p>
+      </div>
+      <div class="more">
+        <a href="${item.link}" target="_blank" rel="noopener">Learn more →</a>
+        <span title="Save">☆</span>
+      </div>
+    `;
+    return el;
+  }
+
+  function renderResults(list){
+    const box = $('#results');
+    box.innerHTML = '';
+    if(!list.length){
+      box.innerHTML = `<div class="tile" style="grid-column:1/-1">No matches. Try another keyword or a city like <em>Kyoto</em>.</div>`;
+      return;
+    }
+    list.forEach(item => box.appendChild(createCard(item)));
+  }
+
+  function parseQuery(q){
+    const s = q.trim().toLowerCase();
+    if(!s) return { kind: 'empty' };
+    if(['beach','beaches'].includes(s)) return { kind: 'category', value: 'beach' };
+    if(['temple','temples'].includes(s)) return { kind: 'category', value: 'temple' };
+    // detect city: if it matches a dataset city/city,country or contains a comma
+    const isCityLike = s.includes(',') || DESTINATIONS.some(d => d.city.toLowerCase() === s || `${d.city.toLowerCase()}, ${d.country.toLowerCase()}` === s);
+    if(isCityLike) return { kind: 'city', value: q.trim() };
+    return { kind: 'keyword', value: s };
+  }
+
+  function search(q){
+    const intent = parseQuery(q);
+    const meta = $('#meta');
+    clearTimeBadge();
+
+    switch(intent.kind){
+      case 'empty':
+        meta.innerHTML = '';
+        renderResults([]);
+        break;
+      case 'category': {
+        const list = DESTINATIONS.filter(d => d.type === intent.value);
+        meta.innerHTML = `<span class="time-badge">Showing top ${intent.value} picks</span>`;
+        renderResults(list);
+        break;
+      }
+      case 'city': {
+        const s = intent.value.trim();
+        const list = DESTINATIONS.filter(d =>
+          `${d.city}, ${d.country}`.toLowerCase() === s.toLowerCase() ||
+          d.city.toLowerCase() === s.toLowerCase()
+        );
+        meta.innerHTML = `<span class="time-badge" id="cityTime">Local time: --:--</span>`;
+        startCityClock(s);
+        renderResults(list.length ? list : DESTINATIONS.filter(d => d.type === 'city'));
+        break;
+      }
+      case 'keyword': {
+        const list = DESTINATIONS.filter(d =>
+          d.name.toLowerCase().includes(intent.value) ||
+          d.description.toLowerCase().includes(intent.value) ||
+          d.city.toLowerCase().includes(intent.value) ||
+          d.country.toLowerCase().includes(intent.value)
+        );
+        meta.innerHTML = `<span class="time-badge">Results for "${q.trim()}"</span>`;
+        renderResults(list);
+        break;
+      }
+    }
+  }
+
+  // ------------------------------
+  // City time rendering
+  // ------------------------------
+  let clockInterval = null;
+  function clearTimeBadge(){
+    if(clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    const t = document.getElementById('cityTime');
+    if(t) t.textContent = 'Local time: --:--';
+  }
+
+  function resolveTimeZone(input){
+    // Normalize input to a known key if possible
+    const key = Object.keys(CITY_TIMEZONES).find(k => k.toLowerCase() === input.toLowerCase());
+    if(key) return CITY_TIMEZONES[key];
+    // Try to pull city name before comma
+    const city = input.split(',')[0].trim();
+    const byCity = Object.keys(CITY_TIMEZONES).find(k => k.toLowerCase().startsWith(city.toLowerCase()));
+    return byCity ? CITY_TIMEZONES[byCity] : null;
+  }
+
+  function startCityClock(input){
+    const tz = resolveTimeZone(input);
+    const badge = document.getElementById('cityTime');
+    if(!badge) return;
+    if(!tz){
+      badge.textContent = 'Local time: unavailable';
+      return;
+    }
+    function tick(){
+      const now = new Date();
+      const fmt = new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: tz });
+      badge.textContent = `Local time: ${fmt.format(now)} (${tz})`;
+    }
+    tick();
+    clockInterval = setInterval(tick, 1000);
+  }
+
+  // ------------------------------
+  // Contact form (client-side demo)
+  // ------------------------------
+  const form = document.getElementById('contactForm');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = data.get('name')?.toString().trim();
+    const email = data.get('email')?.toString().trim();
+    const message = data.get('message')?.toString().trim();
+
+    const status = document.getElementById('formStatus');
+    status.style.color = 'var(--muted)';
+
+    if(!name || !email || !message){
+      status.style.color = '#fca5a5';
+      status.textContent = 'Please complete all fields.';
+      return;
+    }
+
+    // Fake async submit
+    status.textContent = 'Sending…';
+    setTimeout(() => {
+      status.style.color = '#86efac';
+      status.textContent = 'Thanks! We’ll get back to you shortly.';
+      form.reset();
+    }, 600);
+  });
+
+  // ------------------------------
+  // Nav state + interactions
+  // ------------------------------
+  const input = document.getElementById('query');
+  document.getElementById('searchBtn').addEventListener('click', () => search(input.value));
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); search(input.value); }});
+  $$('.chip').forEach(c => c.addEventListener('click', () => { input.value = c.dataset.q; search(c.dataset.q); }));
+
+  // Update active menu link on scroll/hash
+  function setActive(){
+    const h = location.hash || '#home';
+    $$('.menu a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === h));
+  }
+  window.addEventListener('hashchange', setActive);
+
+  // Initialize default view
+  document.getElementById('year').textContent = new Date().getFullYear();
+  setActive();
+  // Show some curated content by default
+  renderResults(DESTINATIONS.filter(d => d.type !== 'temple').slice(0,4));
+  </script>
+</body>
+</html>
